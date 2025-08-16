@@ -1,0 +1,6 @@
+{
+  "algorithm": "BFS",
+  "map_name": "maps/level_3.txt",
+  "output_file": "test_main_solution",
+  "generate_animation": true
+}
