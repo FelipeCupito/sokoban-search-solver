@@ -1,0 +1,6 @@
+{
+  "algorithm": "BFS",
+  "map_name": "maps/level_5.txt",
+  "output_file": "lvl5_bfs_solution",
+  "generate_animation": true
+}

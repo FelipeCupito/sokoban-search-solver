@@ -1,9 +1,9 @@
-from typing import Set, Tuple, List, Optional
+from typing import Iterable, Tuple, List, Optional
 
 
 class SokobanState:
     def __init__(self, player_pos: Tuple[int, int],
-                 boxes: Set[Tuple[int, int]], 
+                 boxes: Iterable[Tuple[int, int]],
                  walls: frozenset[Tuple[int, int]],
                  goals: frozenset[Tuple[int, int]]):
         self.player_pos = player_pos
@@ -47,11 +47,10 @@ class SokobanState:
             if new_player_pos in self.walls:
                 continue
             
-            new_boxes = set(self.boxes)
-            
+            boxes = self.boxes
+
             # Si hay una caja en la nueva posición del jugador
             if new_player_pos in self.boxes:
-                # Calcular nueva posición de la caja
                 new_box_pos = (new_player_pos[0] + dr, new_player_pos[1] + dc)
                 
                 # Verificar si la nueva posición de la caja es válida
@@ -61,15 +60,15 @@ class SokobanState:
                 # Verificar deadlock antes de crear el estado
                 if DeadlockDetector.is_deadlock(new_box_pos, self.boxes, self.walls, self.goals):
                     continue
-                
-                # Mover la caja
+
+                # New boxes instance only in case of push
+                new_boxes = set(self.boxes)
                 new_boxes.remove(new_player_pos)
                 new_boxes.add(new_box_pos)
-                
+                boxes = frozenset(new_boxes)
                 action += "_PUSH"
-            
-            # Crear nuevo estado
-            new_state = SokobanState(new_player_pos, new_boxes, self.walls, self.goals)
+
+            new_state = SokobanState(new_player_pos, boxes, self.walls, self.goals)
             new_state.parent = self
             new_state.action = action
             new_state.cost = self.cost + 1

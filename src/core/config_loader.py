@@ -18,7 +18,7 @@ class ConfigLoader:
         self.config_path = config_path
         
         if not os.path.exists(config_path):
-            raise FileNotFoundError(f"El archivo de configuración '{config_path}' no fue encontrado.")
+            raise FileNotFoundError(f"Config file '{config_path}' is missing.")
 
         with open(config_path, "r") as f:
             config = json.load(f)
