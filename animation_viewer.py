@@ -8,18 +8,13 @@ def main():
     auto_play = True
 
     try:
-        print(f"📁 Cargando: {animation_file}")
+        print(f"📁 Loading: {animation_file}")
         animator = SokobanAnimator(animation_file, map_file)
-        
-        # Mostrar resumen
         animator.show_summary()
-        
-        print("\n🎬 Reproduciendo animación...")
+        print("\n🎬 Playing animation...")
         animator.play(speed=animation_speed, auto_play=auto_play)
-        
     except Exception as e:
         print(f"❌ Error: {e}")
-
 
 
 if __name__ == "__main__":

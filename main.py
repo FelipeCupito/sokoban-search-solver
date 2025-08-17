@@ -9,44 +9,33 @@ def main():
     print(" -- 🎮 SOKOBAN 🎮 --")
 
     if len(sys.argv) < 2:
-        print("Error: Se requiere un archivo de configuración como argumento.")
-        print("Uso: python main.py <ruta_al_archivo_de_configuración>")
+        print("Error: A configuration file is required as an argument.")
+        print("Usage: python main.py <path_to_config_file>")
         exit(1)
 
     try:
-        # Cargar configuración
         cfg = ConfigLoader(sys.argv[1])
-
-        # Cargar mapa
-        print(f"Cargando nivel: {cfg.map_name}...")
+        print(f"Loading level: {cfg.map_name}...")
         initial_state = MapLoader.load_from_file(cfg.map_name)
 
-        # Crear el motor de búsqueda con el algoritmo y heurística especificados
         engine = SearchEngine(cfg.algorithm, cfg.heuristic)
-
-        # Iniciar la búsqueda
-        print(f"Iniciando búsqueda con el algoritmo: {cfg.algorithm.get_algorithm_type()}...")
+        print(f"Starting search with algorithm: {cfg.algorithm.get_algorithm_type()}...")
         result = engine.search(initial_state)
-
-        # Imprimir resumen del resultado
         result.print_summary()
 
-        # Exportar solución
         if result.success:
-            print(f"Exportando solución a '{cfg.output_file}'...")
+            print(f"Exporting solution to 'output/{cfg.output_file}'...")
             result.export_solution(cfg.output_file, cfg.generate_animation_file)
-            print(f"Solución exportada exitosamente.")
+            print(f"Solution exported successfully.")
 
-        # Mostrar información sobre archivos generados
         if cfg.generate_animation_file:
             animation_file = handle_file_path(ResultFileType.ANIMATION, OutputFormat.CSV, cfg.output_file)
-            print(f"\n Archivo de animación generado: {animation_file}")
-            print(f"Para ver la animación ejecuta: python test_animator.py")
+            print(f"\nAnimation file generated: {animation_file}")
+            print(f"To view the animation, run: python -m src.core.animator <animation_csv> [map_file]")
         else:
-            print("\nSolo se generaron archivos de métricas (no animación)")
-
+            print("\nOnly metrics files were generated (no animation)")
     except Exception as e:
-        print(f"Error inesperado: {e}")
+        print(f"Unexpected error: {e}")
 
 
 if __name__ == "__main__":
