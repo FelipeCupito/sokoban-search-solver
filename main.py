@@ -27,13 +27,12 @@ def main():
             print(f"Exporting solution to 'output/{cfg.output_file}'...")
             result.export_solution(cfg.output_file, cfg.generate_animation_file)
             print(f"Solution exported successfully.")
-
-        if cfg.generate_animation_file:
-            animation_file = handle_file_path(ResultFileType.ANIMATION, OutputFormat.CSV, cfg.output_file)
-            print(f"\nAnimation file generated: {animation_file}")
-            print(f"To view the animation, run: python -m src.core.animator <animation_csv> [map_file]")
-        else:
-            print("\nOnly metrics files were generated (no animation)")
+            if cfg.generate_animation_file:
+                animation_file = handle_file_path(ResultFileType.ANIMATION, OutputFormat.CSV, cfg.output_file)
+                print(f"\nAnimation file generated: {animation_file}")
+                print(f"To view the animation, run: python -m src.core.animator output/animation_{cfg.output_file}.csv {cfg.map_name}")
+            else:
+                print("\nOnly metrics files were generated (no animation)")
     except Exception as e:
         print(f"Unexpected error: {e}")
 

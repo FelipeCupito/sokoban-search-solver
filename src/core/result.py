@@ -10,6 +10,7 @@ from src.core.utils import handle_file_path, ResultFileType, OutputFormat
 class SearchResult:
     success: bool
     states_path: List[SokobanState]
+    actions_path: List[str]  # aligned with states_path; index 0 is "START"
     cost: int
     nodes_expanded: int
     max_frontier_size: int
@@ -18,14 +19,15 @@ class SearchResult:
 
 
     @classmethod
-    def create_success(cls, final_state: SokobanState, nodes_expanded: int, 
-                      max_frontier_size: int, processing_time: float, 
+    def create_success(cls, states_path: List[SokobanState], actions_path: List[str], nodes_expanded: int,
+                      max_frontier_size: int, processing_time: float,
                       algorithm_type: str) -> 'SearchResult':
-        path = cls._reconstruct_path(final_state)
+        cost = max(0, len(states_path) - 1)
         return cls(
-            success= True,
-            states_path=path,
-            cost=final_state.cost,
+            success=True,
+            states_path=states_path,
+            actions_path=actions_path,
+            cost=cost,
             nodes_expanded=nodes_expanded,
             max_frontier_size=max_frontier_size,
             processing_time=processing_time,
@@ -36,23 +38,15 @@ class SearchResult:
     def create_failure(cls, nodes_expanded: int, max_frontier_size: int, 
                       processing_time: float, algorithm_type: str) -> 'SearchResult':
         return cls(
-            success= False,
+            success=False,
             states_path=[],
+            actions_path=[],
             cost=0,
             nodes_expanded=nodes_expanded,
             max_frontier_size=max_frontier_size,
             processing_time=processing_time,
             algorithm_type=algorithm_type
         )
-    
-    @staticmethod
-    def _reconstruct_path(final_state: SokobanState) -> List[SokobanState]:
-        path = []
-        current = final_state
-        while current:
-            path.append(current)
-            current = current.parent
-        return path[::-1]
     
     def export_solution(self, filename: str = None, generate_animation_file: bool = False):
         if not self.success:
@@ -95,11 +89,8 @@ class SearchResult:
         if not self.states_path or len(self.states_path) < 2:
             return []
         
-        moves = []
-        for i in range(1, len(self.states_path)):
-            if self.states_path[i].action:
-                moves.append(self.states_path[i].action)
-        return moves
+        # Skip the first action (START)
+        return self.actions_path[1:]
 
     def _extract_states_for_animation(self, file_name: str = None) -> None:
         file_path = handle_file_path(ResultFileType.ANIMATION, OutputFormat.CSV, file_name)
@@ -116,8 +107,5 @@ class SearchResult:
                     i,
                     player_str,
                     boxes_str,
-                    state.action if i > 0 else "START"
+                    self.actions_path[i] if i < len(self.actions_path) else ("START" if i == 0 else "")
                 ])
-
-
-

@@ -1,25 +1,22 @@
-from typing import Iterable, Tuple, List, Optional
+from typing import Iterable, Tuple, List
 
 
 class SokobanState:
+    __slots__ = (
+        'player_pos', 'boxes', 'walls', 'goals', '_hash', '_is_goal_cache',
+    )
+
     def __init__(self, player_pos: Tuple[int, int],
                  boxes: Iterable[Tuple[int, int]],
                  walls: frozenset[Tuple[int, int]],
                  goals: frozenset[Tuple[int, int]]):
         self.player_pos = player_pos
-        self.boxes = frozenset(boxes)  # Inmutable para hashing
+        self.boxes = frozenset(boxes)  # immutable for hashing
         self.walls = walls
         self.goals = goals
-        
-        # Para reconstruir el path
-        self.parent: Optional['SokobanState'] = None
-        self.action: Optional[str] = None
-        self.cost: int = 0
-        
-        # Cache para optimización
         self._hash = None
         self._is_goal_cache = None
-    
+
     def __eq__(self, other):
         if not isinstance(other, SokobanState):
             return False
@@ -30,20 +27,24 @@ class SokobanState:
         if self._hash is None:
             self._hash = hash((self.player_pos, self.boxes))
         return self._hash
-    
+
+    def key(self) -> tuple:
+        """Hashable identity for this state."""
+        return self.player_pos, self.boxes
+
     def is_goal(self) -> bool:
         if self._is_goal_cache is None:
             self._is_goal_cache = self.boxes == self.goals
         return self._is_goal_cache
     
-    def get_successors(self) -> List['SokobanState']:
-        successors = []
+    def get_successors(self) -> List[tuple['SokobanState', str]]:
+        successors: List[tuple['SokobanState', str]] = []
         directions = [(-1, 0, "UP"), (1, 0, "DOWN"), (0, -1, "LEFT"), (0, 1, "RIGHT")]
         
         for dr, dc, action in directions:
             new_player_pos = (self.player_pos[0] + dr, self.player_pos[1] + dc)
             
-            # Verificar si la nueva posición del jugador es válida
+            # invalid if hits wall
             if new_player_pos in self.walls:
                 continue
             
@@ -69,13 +70,9 @@ class SokobanState:
                 action += "_PUSH"
 
             new_state = SokobanState(new_player_pos, boxes, self.walls, self.goals)
-            new_state.parent = self
-            new_state.action = action
-            new_state.cost = self.cost + 1
-            successors.append(new_state)
-        
+            successors.append((new_state, action))
+
         return successors
-    
     
 
 class DeadlockDetector:
