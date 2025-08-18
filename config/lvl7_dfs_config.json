@@ -1,0 +1,6 @@
+{
+  "algorithm": "DFS",
+  "map_name": "maps/level_7.txt",
+  "output_file": "lvl7_dfs_solution",
+  "generate_animation": true
+}

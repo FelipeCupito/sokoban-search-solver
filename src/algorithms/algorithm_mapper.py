@@ -1,6 +1,7 @@
 from enum import Enum
 from src.core.interfaces import ISearchAlgorithm
 from src.algorithms.bfs import BFSAlgorithm
+from src.algorithms.dfs import DFS
 
 class AlgorithmType(Enum):
     BFS = "BFS"
@@ -14,6 +15,8 @@ class AlgorithmMapper:
     def get_algorithm_by_type(algorithm_type: AlgorithmType) -> ISearchAlgorithm:
         if AlgorithmType.BFS == algorithm_type:
             return BFSAlgorithm()
+        if AlgorithmType.DFS == algorithm_type:
+            return DFS()
         else:
             raise ValueError(f"Algoritmo desconocido: {algorithm_type}")
 
