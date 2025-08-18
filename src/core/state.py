@@ -91,10 +91,6 @@ class DeadlockDetector:
         if DeadlockDetector._is_corner_deadlock(box_pos, walls, goals):
             return True
         
-        # Deadlock 2: Caja contra pared sin goals accesibles
-        if DeadlockDetector._is_wall_deadlock(box_pos, walls, goals):
-            return True
-        
         # Deadlock 3: Cuadrado 2x2 de cajas sin goals
         if DeadlockDetector._is_square_deadlock(box_pos, boxes, goals):
             return True

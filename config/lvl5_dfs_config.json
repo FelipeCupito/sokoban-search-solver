@@ -1,0 +1,7 @@
+{
+  "algorithm": "DFS",
+  "map_name": "maps/level_5.txt",
+  "output_file": "dfs_smoke_test",
+  "generate_animation": false
+}
+
