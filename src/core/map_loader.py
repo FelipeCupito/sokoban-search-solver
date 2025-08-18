@@ -8,6 +8,8 @@ class TileType(Enum):
     BOX = '$'
     GOAL = '.'
     SPACE = ' '
+    BOX_ON_GOAL = '*'
+    PLAYER_ON_GOAL = '+'
 
 class MapLoader:
     """Carga mapas de Sokoban desde strings o archivos"""
@@ -37,7 +39,13 @@ class MapLoader:
                     player_pos = pos
                 elif char == TileType.BOX.value:
                     boxes.add(pos)
+                elif char == TileType.BOX_ON_GOAL.value:
+                    boxes.add(pos)
+                    goals.add(pos)
                 elif char == TileType.GOAL.value:
+                    goals.add(pos)
+                elif char == TileType.PLAYER_ON_GOAL.value:
+                    player_pos = pos
                     goals.add(pos)
                 # TileType.SPACE se ignora (espacio libre)
         
