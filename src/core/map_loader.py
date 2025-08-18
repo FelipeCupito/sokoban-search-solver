@@ -12,18 +12,18 @@ class TileType(Enum):
     PLAYER_ON_GOAL = '+'
 
 class MapLoader:
-    """Carga mapas de Sokoban desde strings o archivos"""
+    """Loads Sokoban maps from strings or files"""
 
     @staticmethod
     def load_from_file(file_path: str) -> SokobanState:
-        """Carga un mapa desde archivo"""
+        """Loads a map from file"""
         with open(file_path, 'r') as f:
             lines = [line.rstrip() for line in f.readlines()]
         return MapLoader._parse_lines(lines)
     
     @staticmethod
     def _parse_lines(lines: List[str]) -> SokobanState:
-        """Parsea las líneas del mapa y crea SokobanState"""
+        """Parses map lines and creates SokobanState"""
         walls = set()
         boxes = set()
         goals = set()
@@ -37,6 +37,9 @@ class MapLoader:
                     walls.add(pos)
                 elif char == TileType.PLAYER.value:
                     player_pos = pos
+                elif char == TileType.PLAYER_ON_GOAL.value:
+                    player_pos = pos
+                    goals.add(pos)
                 elif char == TileType.BOX.value:
                     boxes.add(pos)
                 elif char == TileType.BOX_ON_GOAL.value:
@@ -44,22 +47,22 @@ class MapLoader:
                     goals.add(pos)
                 elif char == TileType.GOAL.value:
                     goals.add(pos)
-                elif char == TileType.PLAYER_ON_GOAL.value:
-                    player_pos = pos
-                    goals.add(pos)
-                # TileType.SPACE se ignora (espacio libre)
+                elif char == TileType.SPACE.value:
+                    continue
+                else:
+                    raise ValueError(f"Unknown character '{char}' in map")
         
         if player_pos is None:
-            raise ValueError(f"No se encontró jugador ({TileType.PLAYER}) en el mapa")
+            raise ValueError(f"Player ({TileType.PLAYER}) not found in map")
         
         if not boxes:
-            raise ValueError(f"No se encontraron cajas ({TileType.BOX}) en el mapa")
+            raise ValueError(f"Boxes ({TileType.BOX}) not found in map")
         
         if not goals:
-            raise ValueError(f"No se encontraron objetivos ({TileType.WALL}) en el mapa")
+            raise ValueError(f"Goals ({TileType.GOAL}) not found in map")
         
         if len(boxes) != len(goals):
-            raise ValueError(f"Número de cajas ({len(boxes)}) no coincide con objetivos ({len(goals)})")
+            raise ValueError(f"Number of boxes ({len(boxes)}) doesn't match goals ({len(goals)})")
         
         return SokobanState(
             player_pos=player_pos,
