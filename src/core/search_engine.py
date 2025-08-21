@@ -1,32 +1,18 @@
 import time
-from typing import Optional, Dict, Tuple, List, Set
+from typing import Optional, List, Set, Tuple
 from src.core.state import SokobanState, StateNode
 from src.core.result import SearchResult
 from src.core.interfaces import ISearchAlgorithm, IHeuristic
 
 
-def _reconstruct_path(
-        states_by_key: Dict[str, SokobanState],
-        parents: Dict[str, Tuple[Optional[str], str]],
-        goal_key: str,
-) -> Tuple[List[SokobanState], List[str]]:
-    """Build the sequence of states and actions from the start to the goal."""
-    path_states: List[SokobanState] = []
-    path_actions: List[str] = []
+def _reconstruct_path_from_node(goal_node: StateNode) -> Tuple[List[SokobanState], List[str]]:
+    states, actions = [], []
+    while goal_node:
+        states.append(goal_node.state)
+        actions.append(goal_node.action)
+        goal_node = goal_node.parent
 
-    current_key: Optional[str] = goal_key
-    while current_key:
-        path_states.append(states_by_key[current_key])
-        parent_info = parents.get(current_key)
-        if not parent_info:
-            # Should not happen for a well-formed tree; treat as start
-            break
-
-        current_key, action = parent_info
-        path_actions.append(action)
-
-    return list(reversed(path_states)), ["START"] + list(reversed(path_actions))
-
+    return states[::-1], actions[::-1]
 
 
 class SearchEngine:
@@ -35,46 +21,42 @@ class SearchEngine:
     def __init__(self, algorithm: ISearchAlgorithm, heuristic: Optional[IHeuristic] = None):
         if not algorithm:
             raise ValueError("Algorithm cannot be None")
-        if heuristic and not algorithm.needs_heuristic():
-            raise ValueError(f"{algorithm.get_algorithm_type()} does not require a heuristic")
+        if algorithm.needs_heuristic() and heuristic is None:
+            raise ValueError(f"{algorithm.get_algorithm_type()} requires a heuristic")
 
         self.algorithm = algorithm
         self.heuristic = heuristic
 
     def search(self, initial_state: SokobanState) -> SearchResult:
         self._init_metrics()
-        
-        current_node = StateNode(initial_state)
+        current_node = StateNode(initial_state, parent=None, action="START")
 
-        # Trivial case: already at the goal.
         if initial_state.is_goal():
-            return self._create_success([initial_state], ["START"]) # TODO: hacer que resiva un node
+            states, actions = _reconstruct_path_from_node(current_node)
+            return self._create_success(states, actions)
 
-        # Bookkeeping nodes
-        closed_nodes: Set[int] = set()
-        closed_nodes.add(current_node)
+        closed_states: Set[SokobanState] = set()
+        closed_states.add(current_node.state)
 
         self.algorithm.add(current_node, self.heuristic)
+        self.max_frontier_size = max(self.max_frontier_size, self.algorithm.size())
 
         # Core search loop driven by the algorithm implementation.
         while self.algorithm.has_next():
-            self.max_frontier_size = max(self.max_frontier_size, self.algorithm.size())
-
             current_node = self.algorithm.get_next()
-
-            if current_node in closed_nodes:
-                continue
-
-            closed_nodes.add(current_node)
-            
             self.nodes_expanded += 1
 
             for successor_node in current_node.get_successors():
+                if successor_node.state in closed_states:
+                    continue
+                closed_states.add(successor_node.state)
 
                 if successor_node.state.is_goal():
-                    return self._create_success(successor_node)
+                    states, actions = _reconstruct_path_from_node(successor_node)
+                    return self._create_success(states, actions)
 
                 self.algorithm.add(successor_node, self.heuristic)
+                self.max_frontier_size = max(self.max_frontier_size, self.algorithm.size())
 
         return self._create_failure()
 
@@ -83,18 +65,15 @@ class SearchEngine:
         self.nodes_expanded = 0
         self.max_frontier_size = 0
 
-
-    def _create_success(self, state: SokobanState) -> SearchResult:
-        
-        
+    def _create_success(self, states: List[SokobanState], actions: List[str]) -> SearchResult:
         return SearchResult.create_success(
-            states = 
+            states,
             actions,
             self.nodes_expanded,
             self.max_frontier_size,
             time.time() - self.start_time,
             self.algorithm.get_algorithm_type(),
-            )
+        )
 
     def _create_failure(self) -> SearchResult:
         return SearchResult.create_failure(
@@ -102,4 +81,4 @@ class SearchEngine:
             self.max_frontier_size,
             time.time() - self.start_time,
             self.algorithm.get_algorithm_type(),
-            )
+        )
