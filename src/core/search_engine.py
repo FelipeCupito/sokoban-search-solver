@@ -1,6 +1,6 @@
 import time
 from typing import Optional, Dict, Tuple, List, Set
-from src.core.state import SokobanState
+from src.core.state import SokobanState, StateNode
 from src.core.result import SearchResult
 from src.core.interfaces import ISearchAlgorithm, IHeuristic
 
@@ -28,6 +28,7 @@ def _reconstruct_path(
     return list(reversed(path_states)), ["START"] + list(reversed(path_actions))
 
 
+
 class SearchEngine:
     """ Orchestrates a search using a provided algorithm and an optional heuristic."""
 
@@ -39,66 +40,55 @@ class SearchEngine:
 
         self.algorithm = algorithm
         self.heuristic = heuristic
-        self._reset_metrics()
 
     def search(self, initial_state: SokobanState) -> SearchResult:
-        self.start_time = time.time()
-        self._reset_metrics()
+        self._init_metrics()
+        
+        current_node = StateNode(initial_state)
 
         # Trivial case: already at the goal.
         if initial_state.is_goal():
-            return self._create_success([initial_state], ["START"])
+            return self._create_success([initial_state], ["START"]) # TODO: hacer que resiva un node
 
-        # Bookkeeping maps and sets.
-        parents: Dict[str, Tuple[Optional[str], str]] = {}
-        states_by_key: Dict[str, SokobanState] = {}
-        closed_keys: Set[str] = set()
-        seen_keys: Set[str] = set()
+        # Bookkeeping nodes
+        closed_nodes: Set[int] = set()
+        closed_nodes.add(current_node)
 
-        # Seed the frontier with the initial state.
-        init_key = initial_state.key()
-        parents[init_key] = (None, "START")
-        states_by_key[init_key] = initial_state
-        seen_keys.add(init_key)
-        self.algorithm.add(initial_state, self.heuristic)
+        self.algorithm.add(current_node, self.heuristic)
 
         # Core search loop driven by the algorithm implementation.
         while self.algorithm.has_next():
             self.max_frontier_size = max(self.max_frontier_size, self.algorithm.size())
 
-            current_state = self.algorithm.get_next()
-            current_key = current_state.key()
+            current_node = self.algorithm.get_next()
 
-            if current_key in closed_keys:
+            if current_node in closed_nodes:
                 continue
 
-            closed_keys.add(current_key)
+            closed_nodes.add(current_node)
+            
             self.nodes_expanded += 1
 
-            for successor, action in current_state.get_successors():
-                successor_key = successor.key()
-                if successor_key in seen_keys:
-                    continue
+            for successor_node in current_node.get_successors():
 
-                parents[successor_key] = (current_key, action)
-                states_by_key[successor_key] = successor
-                seen_keys.add(successor_key)
+                if successor_node.state.is_goal():
+                    return self._create_success(successor_node)
 
-                if successor.is_goal():
-                    states, actions = _reconstruct_path(states_by_key, parents, successor_key)
-                    return self._create_success(states, actions)
-
-                self.algorithm.add(successor, self.heuristic)
+                self.algorithm.add(successor_node, self.heuristic)
 
         return self._create_failure()
 
-    def _reset_metrics(self) -> None:
+    def _init_metrics(self) -> None:
+        self.start_time = time.time()
         self.nodes_expanded = 0
         self.max_frontier_size = 0
 
-    def _create_success(self, states: List[SokobanState], actions: List[str]) -> SearchResult:
+
+    def _create_success(self, state: SokobanState) -> SearchResult:
+        
+        
         return SearchResult.create_success(
-            states,
+            states = 
             actions,
             self.nodes_expanded,
             self.max_frontier_size,
