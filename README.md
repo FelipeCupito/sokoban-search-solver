@@ -36,6 +36,14 @@ Un solver avanzado de Sokoban que implementa múltiples algoritmos de búsqueda 
 - Reconstrucción automática de caminos
 
 ## 🚀 Uso
+### Instalación
+Los paquetes de python necesarios para la ejecución se encuentran en el archivo "requirements.txt".
+Los mismos pueden ser instalados mediante la ejecución de:
+```bash
+# Instalar paquetes de python
+pip install -r requirements.txt
+```
+
 
 ### Ejecución básica
 ```bash
