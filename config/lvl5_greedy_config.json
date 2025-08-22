@@ -1,0 +1,7 @@
+{
+  "algorithm": "Greedy",
+  "heuristic": "Manhattan",
+  "map_name": "maps/level_5.txt",
+  "output_file": "lvl5_greedy_solution",
+  "generate_animation": true
+}

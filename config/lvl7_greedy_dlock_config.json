@@ -1,0 +1,7 @@
+{
+  "algorithm": "Greedy",
+  "heuristic": "Deadlock",
+  "map_name": "maps/level_7.txt",
+  "output_file": "lvl7_greedy_dlock_solution",
+  "generate_animation": true
+}

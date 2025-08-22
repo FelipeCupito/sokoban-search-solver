@@ -1,10 +1,14 @@
 from enum import Enum
 from src.core.interfaces import IHeuristic
+from .manhattan_heu import ManhattanHeuristic
+from .deadlock import DeadlockDetector
+from .perfect_match import PerfectMatch
 
 
 class HeuristicType(Enum):
-    MANHATTAN = "Manhattan" # TODO: Implementar
-    EUCLIDEAN = "Euclidean" # TODO: Implementar
+    MANHATTAN = "MANHATTAN"
+    DEADLOCK = "DEADLOCK"
+    PERFECT_MATCH = "PERFECTMATCH" 
 
 
 class HeuristicMapper:
@@ -12,9 +16,11 @@ class HeuristicMapper:
     @staticmethod
     def get_heuristic_by_type(heuristic_type: HeuristicType) -> IHeuristic:
         if HeuristicType.MANHATTAN == heuristic_type:
-            raise NotImplementedError("Heurística Manhattan aún no implementada")
-        elif HeuristicType.EUCLIDEAN == heuristic_type:
-            raise NotImplementedError("Heurística Manhattan aún no implementada")
+            return ManhattanHeuristic()
+        elif HeuristicType.DEADLOCK == heuristic_type:
+            return DeadlockDetector()
+        elif HeuristicType.PERFECT_MATCH == heuristic_type:
+            return PerfectMatch()
         else:
             raise ValueError(f"Heurística desconocida: {heuristic_type}")
 

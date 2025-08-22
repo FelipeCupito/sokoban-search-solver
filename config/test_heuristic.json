@@ -1,0 +1,7 @@
+{
+  "algorithm": "Greedy",
+  "heuristic":"Perfect_Match",
+  "map_name": "maps/level_3.txt",
+  "output_file": "test_h",
+  "generate_animation": false
+}

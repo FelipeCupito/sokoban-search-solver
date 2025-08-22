@@ -1,0 +1,7 @@
+{
+  "algorithm": "Greedy",
+  "heuristic": "Perfect_Match",
+  "map_name": "maps/level_5.txt",
+  "output_file": "lvl5_greedy_pm_solution",
+  "generate_animation": true
+}
