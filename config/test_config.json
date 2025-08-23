@@ -1,6 +1,7 @@
 {
-  "algorithm": "BFS",
-  "map_name": "maps/level_3.txt",
+  "algorithm": "ASTAR",
+  "heuristic": "MANHATTAN",
+  "map_name": "maps/level_8.txt",
   "output_file": "test_main_solution",
   "generate_animation": true
 }

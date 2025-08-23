@@ -1,4 +1,5 @@
 from enum import Enum
+from src.algorithms.astar import AStar
 from src.core.interfaces import ISearchAlgorithm
 from src.algorithms.bfs import BFSAlgorithm
 from src.algorithms.dfs import DFS
@@ -7,9 +8,9 @@ from src.algorithms.greedy import GreedyAlgorithm
 class AlgorithmType(Enum):
     BFS = "BFS"
     DFS = "DFS"
-    ASTAR = "A*"
+    ASTAR = "ASTAR"
     GREEDY = "GREEDY"
-    
+
 
 class AlgorithmMapper:
 
@@ -19,6 +20,8 @@ class AlgorithmMapper:
             return BFSAlgorithm()
         elif AlgorithmType.DFS == algorithm_type:
             return DFS()
+        elif AlgorithmType.ASTAR == algorithm_type:
+            return AStar()
         elif AlgorithmType.GREEDY == algorithm_type:
             return GreedyAlgorithm()
         else:
