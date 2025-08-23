@@ -36,7 +36,7 @@ class SearchEngine:
         self.algorithm.add(start_node, self.heuristic)
         self._update_frontier_size()
 
-        if self.algorithm.cache_cost():
+        if self.algorithm.should_cache_cost():
             return self._search_with_cost_caching(initial_state)
         else:
             return self._search_without_cost_caching(initial_state)

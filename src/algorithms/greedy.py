@@ -25,5 +25,8 @@ class GreedyAlgorithm(ISearchAlgorithm):
     def needs_heuristic(self) -> bool:
         return True
 
+    def should_cache_cost(self) -> bool:
+        return False
+
     def get_algorithm_type(self) -> str:
         return "Greedy"

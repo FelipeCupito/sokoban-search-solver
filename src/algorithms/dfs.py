@@ -21,5 +21,8 @@ class DFS(ISearchAlgorithm):
     def needs_heuristic(self) -> bool:
         return False
 
+    def should_cache_cost(self) -> bool:
+        return False
+
     def get_algorithm_type(self) -> str:
         return "DFS"

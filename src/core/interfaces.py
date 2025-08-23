@@ -41,3 +41,8 @@ class ISearchAlgorithm(ABC):
     def get_algorithm_type(self) -> str:
         """Retorna el tipo de algoritmo como enum"""
         raise NotImplementedError("This method should be overridden")
+
+    @abstractmethod
+    def should_cache_cost(self) -> bool:
+        """Indica si el algoritmo requiere seguimiento del costo del camino"""
+        raise NotImplementedError("This method should be overridden")
