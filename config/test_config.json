@@ -1,7 +1,7 @@
 {
   "algorithm": "ASTAR",
-  "heuristic": "MANHATTAN",
-  "map_name": "maps/level_8.txt",
+  "heuristic": "SUM_OF_DISTANCE",
+  "map_name": "maps/level_5.txt",
   "output_file": "test_main_solution",
   "generate_animation": true
 }

@@ -20,6 +20,7 @@ def main():
 
         engine = SearchEngine(cfg.algorithm, cfg.heuristic)
         print(f"Starting search with algorithm: {cfg.algorithm.get_algorithm_type()}...")
+        print(f"Heuristic: {cfg.heuristic.__class__.__name__ if cfg.heuristic else 'None'}...")
         result = engine.search(initial_state)
         result.print_summary()
 
