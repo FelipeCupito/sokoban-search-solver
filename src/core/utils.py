@@ -1,6 +1,6 @@
-import time
 from enum import Enum
 import os
+from datetime import datetime
 
 
 class ResultFileType(Enum):
@@ -15,9 +15,9 @@ class OutputFormat(Enum):
 def handle_file_path(result_type: ResultFileType,
                      output_format: OutputFormat,
                      file_name: str = None) -> str:
+    date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
     if file_name is None:
-        timestamp = int(time.time())
-        file_name = f"{result_type.value}_{timestamp}"
+        file_name = f"{result_type.value}_{date_str}"
 
     os.makedirs('output', exist_ok=True)
-    return f"output/{result_type.value}_{file_name}.{output_format.value}"
+    return f"output/{result_type.value}_{file_name}_{date_str}.{output_format.value}"

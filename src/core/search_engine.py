@@ -1,8 +1,9 @@
 import time
-from typing import Optional, List, Set, Tuple, Dict, Callable
+from typing import Optional, List, Set, Tuple, Dict
 from src.core.state import SokobanState, StateNode
 from src.core.result import SearchResult
 from src.core.interfaces import ISearchAlgorithm, IHeuristic
+import src.core as core
 
 
 def _reconstruct_path_from_node(goal_node: StateNode) -> Tuple[List[SokobanState], List[str]]:
@@ -18,7 +19,7 @@ def _reconstruct_path_from_node(goal_node: StateNode) -> Tuple[List[SokobanState
 class SearchEngine:
     """ Orchestrates a search using a provided algorithm and an optional heuristic."""
 
-    def __init__(self, algorithm: ISearchAlgorithm, heuristic: Optional[IHeuristic] = None):
+    def __init__(self, algorithm: ISearchAlgorithm, heuristic: Optional[IHeuristic] = None, pruning: Optional[bool] = None):
         if not algorithm:
             raise ValueError("Algorithm cannot be None")
         if algorithm.needs_heuristic() and heuristic is None:
@@ -26,6 +27,8 @@ class SearchEngine:
 
         self.algorithm = algorithm
         self.heuristic = heuristic
+        if pruning is not None:
+            core.pruning = bool(pruning)
 
     def search(self, initial_state: SokobanState) -> SearchResult:
         self._init_metrics()

@@ -18,9 +18,10 @@ def main():
         print(f"Loading level: {cfg.map_name}...")
         initial_state = MapLoader.load_from_file(cfg.map_name)
 
-        engine = SearchEngine(cfg.algorithm, cfg.heuristic)
+        engine = SearchEngine(cfg.algorithm, cfg.heuristic, cfg.pruning)
         print(f"Starting search with algorithm: {cfg.algorithm.get_algorithm_type()}...")
-        print(f"Heuristic: {cfg.heuristic.__class__.__name__ if cfg.heuristic else 'None'}...")
+        print(f"Heuristic: {cfg.heuristic.__class__.__name__ if cfg.heuristic else 'None'}")
+        print(f"Pruning: {'Enabled' if cfg.pruning else 'Disabled'}")
         result = engine.search(initial_state)
         result.print_summary()
 
@@ -31,7 +32,7 @@ def main():
             if cfg.generate_animation_file:
                 animation_file = handle_file_path(ResultFileType.ANIMATION, OutputFormat.CSV, cfg.output_file)
                 print(f"\nAnimation file generated: {animation_file}")
-                print(f"To view the animation, run: python -m src.core.animator output/animation_{cfg.output_file}.csv {cfg.map_name}")
+                print(f"To view the animation, run: python -m src.core.animator {animation_file} {cfg.map_name}")
             else:
                 print("\nOnly metrics files were generated (no animation)")
     except Exception as e:

@@ -1,5 +1,7 @@
-from typing import Iterable, Tuple, List, Optional
+from typing import Iterable, Tuple, Optional
 from enum import Enum
+import src.core as core
+from src.heuristics.deadlock import DeadlockDetector
 
 
 class Action(Enum):
@@ -57,13 +59,10 @@ class SokobanState:
             if new_player_pos in self.boxes:
                 new_box_pos = (new_player_pos[0] + dr, new_player_pos[1] + dc)
                 
-                # Verificar si la nueva posición de la caja es válida
                 if new_box_pos in self.walls or new_box_pos in self.boxes:
                     continue
-                
-                # # Verificar deadlock antes de crear el estado
-                # if DeadlockDetector.is_deadlock(new_box_pos, self.boxes, self.walls, self.goals):
-                #     continue
+                if core.pruning and DeadlockDetector.is_deadlock(new_box_pos, self.boxes, self.walls, self.goals):
+                    continue
 
                 # New boxes instance only in case of push
                 new_boxes = set(self.boxes)

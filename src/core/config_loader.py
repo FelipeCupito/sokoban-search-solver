@@ -13,6 +13,7 @@ class ConfigLoader:
     DEFAULT_ALGORITHM = "BFS"
     DEFAULT_OUTPUT_FILE = f"result_{int(time.time())}"
     DEFAULT_ANIMATION_FLAG = False
+    DEFAULT_PRUNING_FLAG = False
 
     def __init__(self, config_path: str):
         self.config_path = config_path
@@ -35,3 +36,5 @@ class ConfigLoader:
         self.map_name = config.get("map_name", self.DEFAULT_LEVEL)
         self.output_file = config.get("output_file", self.DEFAULT_OUTPUT_FILE)
         self.generate_animation_file = config.get("generate_animation", self.DEFAULT_ANIMATION_FLAG)
+        self.pruning = config.get("pruning", self.DEFAULT_PRUNING_FLAG)
+
