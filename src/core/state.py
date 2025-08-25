@@ -61,14 +61,16 @@ class SokobanState:
                 
                 if new_box_pos in self.walls or new_box_pos in self.boxes:
                     continue
-                if core.pruning and DeadlockDetector.is_deadlock(new_box_pos, self.boxes, self.walls, self.goals):
-                    continue
 
-                # New boxes instance only in case of push
                 new_boxes = set(self.boxes)
                 new_boxes.remove(new_player_pos)
                 new_boxes.add(new_box_pos)
-                boxes = frozenset(new_boxes)
+                temp_boxes = frozenset(new_boxes)
+                if core.pruning and DeadlockDetector.is_deadlock(new_box_pos, temp_boxes, self.walls, self.goals):
+                    continue
+
+                # New boxes instance only in case of push
+                boxes = temp_boxes
 
             new_state = SokobanState(new_player_pos, boxes, self.walls, self.goals)
             yield new_state, action
