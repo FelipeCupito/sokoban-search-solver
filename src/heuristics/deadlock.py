@@ -36,8 +36,9 @@ class DeadlockDetector(IHeuristic):
             return True
         if DeadlockDetector._is_square_deadlock(box_pos, boxes, goals):
             return True
-        if DeadlockDetector._is_between_corners_no_door(box_pos, walls, goals):
-            return True
+        # Removed over-aggressive between-corners-without-door rule
+        # if DeadlockDetector._is_between_corners_no_door(box_pos, walls, goals):
+        #     return True
         if DeadlockDetector._is_aisle_end_cell(box_pos, walls, goals) and box_pos not in goals:
             return True
         return False
@@ -203,45 +204,40 @@ class DeadlockDetector(IHeuristic):
             walls: frozenset[Tuple[int, int]],
             goals: frozenset[Tuple[int, int]],
     ) -> frozenset[Tuple[int, int]]:
-        """Identifies and caches cells in a grid that are considered "pruned" based on their surroundings"""
+        """Identify cells that are true dead-end sinks (3+ surrounding walls), excluding goals.
+        This safer local rule avoids over-pruning whole corridors that may be required to reach goals.
+        """
         key = (walls, goals)
         cached = DeadlockDetector._aisle_cache.get(key)
         if cached is not None:
             return cached
 
-        min_r, max_r, min_c, max_c = DeadlockDetector._bounds(walls, goals)
+        # Determine bounding box from walls/goals
+        rs = [p[0] for p in walls] + [p[0] for p in goals]
+        cs = [p[1] for p in walls] + [p[1] for p in goals]
+        if rs and cs:
+            min_r, max_r = min(rs), max(rs)
+            min_c, max_c = min(cs), max(cs)
+        else:
+            min_r = max_r = min_c = max_c = 0
 
-        # candidates: all cells (no walls) within bounds
-        floor: Set[Tuple[int, int]] = set(
-            (r, c)
-            for r in range(min_r, max_r + 1)
-            for c in range(min_c, max_c + 1)
-            if (r, c) not in walls
-        )
-        blocked: Set[Tuple[int, int]] = set(walls)
-        protected_goals = set(goals)
-
-        def is_blocked_neighbor(rr: int, cc: int) -> bool:
+        def is_wall(rr: int, cc: int) -> bool:
+            # treat out-of-bounds as walls to be conservative
             if rr < min_r or rr > max_r or cc < min_c or cc > max_c:
-                return True  # out of bounds
-            return (rr, cc) in blocked
+                return True
+            return (rr, cc) in walls
 
-        changed = True
-        while changed:
-            changed = False
-            to_add = []
-            dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-            for (r, c) in floor:
-                if (r, c) in blocked or (r, c) in protected_goals:
+        pruned: Set[Tuple[int, int]] = set()
+        dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # up, down, left, right
+
+        for r in range(min_r, max_r + 1):
+            for c in range(min_c, max_c + 1):
+                if (r, c) in walls or (r, c) in goals:
                     continue
-                cnt = sum(1 for dr, dc in dirs if is_blocked_neighbor(r + dr, c + dc))
-                if cnt >= 3:
-                    to_add.append((r, c))
-            if to_add:
-                blocked.update(to_add)
-                changed = True
+                count_blocked = sum(1 for dr, dc in dirs if is_wall(r + dr, c + dc))
+                if count_blocked >= 3:
+                    pruned.add((r, c))
 
-        pruned_cells = frozenset(p for p in blocked if p not in walls)
-        DeadlockDetector._aisle_cache[key] = pruned_cells
-
-        return pruned_cells
+        result = frozenset(pruned)
+        DeadlockDetector._aisle_cache[key] = result
+        return result
