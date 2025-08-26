@@ -1,0 +1,7 @@
+{
+  "map_name": "maps/level_2.txt",
+  "repetitions": 3,
+  "timeout_minutes": 5,
+  "max_threads": 16,
+  "pruning": false
+}

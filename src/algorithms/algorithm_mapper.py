@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 from src.algorithms.astar import AStar
 from src.core.interfaces import ISearchAlgorithm
 from src.algorithms.bfs import BFSAlgorithm
@@ -34,3 +35,8 @@ class AlgorithmMapper:
             return AlgorithmMapper.get_algorithm_by_type(algorithm_type)
         except KeyError:
             raise ValueError(f"Algoritmo desconocido: {algorithm_name}")
+
+    @staticmethod
+    def get_all_algorithms() -> List[AlgorithmType]:
+        """Retorna todos los tipos de algoritmos disponibles"""
+        return list(AlgorithmType)
