@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List, Optional
 from src.core.interfaces import IHeuristic
 from .manhattan_heu import ManhattanHeuristic
 from .deadlock import DeadlockDetector
@@ -35,3 +36,8 @@ class HeuristicMapper:
             return HeuristicMapper.get_heuristic_by_type(heuristic_type)
         except KeyError:
             raise ValueError(f"Algoritmo desconocido: {heuristic_name}")
+
+    @staticmethod
+    def get_all_heuristics() -> List[Optional[HeuristicType]]:
+        """Retorna todos los tipos de heurísticas disponibles, incluyendo None para sin heurística"""
+        return [None] + list(HeuristicType)

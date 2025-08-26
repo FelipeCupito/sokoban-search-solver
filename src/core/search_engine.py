@@ -20,7 +20,7 @@ def _reconstruct_path_from_node(goal_node: StateNode) -> Tuple[List[SokobanState
 class SearchEngine:
     """ Orchestrates a search using a provided algorithm and an optional heuristic."""
 
-    def __init__(self, algorithm: ISearchAlgorithm, heuristic: Optional[IHeuristic] = None, pruning: Optional[bool] = None):
+    def __init__(self, algorithm: ISearchAlgorithm, heuristic: Optional[IHeuristic] = None, pruning: Optional[bool] = None, metrics_only: bool = False):
         if not algorithm:
             raise ValueError("Algorithm cannot be None")
         if algorithm.needs_heuristic() and heuristic is None:
@@ -28,6 +28,7 @@ class SearchEngine:
 
         self.algorithm = algorithm
         self.heuristic = heuristic
+        self.metrics_only = metrics_only
         if pruning is not None:
             core.pruning = bool(pruning)
 
@@ -103,8 +104,13 @@ class SearchEngine:
         self.max_frontier_size = max(self.max_frontier_size, self.algorithm.size())
 
     def _create_success_from_node(self, node: StateNode) -> SearchResult:
-        states, actions = _reconstruct_path_from_node(node)
-        return self._create_success(states, actions)
+        if self.metrics_only:
+            # En modo metrics_only, no reconstruir el camino
+            solution_cost = node.cost
+            return self._create_success_metrics_only(solution_cost)
+        else:
+            states, actions = _reconstruct_path_from_node(node)
+            return self._create_success(states, actions)
 
     def _init_metrics(self) -> None:
         self.start_time = time.time()
@@ -115,6 +121,15 @@ class SearchEngine:
         return SearchResult.create_success(
             states,
             actions,
+            self.nodes_expanded,
+            self.max_frontier_size,
+            time.time() - self.start_time,
+            self.algorithm.get_algorithm_type(),
+        )
+
+    def _create_success_metrics_only(self, solution_cost: int) -> SearchResult:
+        return SearchResult.create_success_metrics_only(
+            solution_cost,
             self.nodes_expanded,
             self.max_frontier_size,
             time.time() - self.start_time,

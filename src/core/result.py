@@ -17,6 +17,10 @@ class SearchResult:
     processing_time: float
     algorithm_type: str
 
+    @property
+    def solution_cost(self) -> int:
+        """Alias para cost para compatibilidad"""
+        return self.cost
 
     @classmethod
     def create_success(cls, states_path: List[SokobanState], actions_path: List[str], nodes_expanded: int,
@@ -28,6 +32,22 @@ class SearchResult:
             states_path=states_path,
             actions_path=actions_path,
             cost=cost,
+            nodes_expanded=nodes_expanded,
+            max_frontier_size=max_frontier_size,
+            processing_time=processing_time,
+            algorithm_type=algorithm_type
+        )
+    
+    @classmethod
+    def create_success_metrics_only(cls, solution_cost: int, nodes_expanded: int,
+                                   max_frontier_size: int, processing_time: float,
+                                   algorithm_type: str) -> 'SearchResult':
+        """Crear resultado exitoso sin almacenar estados/acciones para benchmarks"""
+        return cls(
+            success=True,
+            states_path=[],  # Vacío para ahorrar memoria
+            actions_path=[],  # Vacío para ahorrar memoria
+            cost=solution_cost,
             nodes_expanded=nodes_expanded,
             max_frontier_size=max_frontier_size,
             processing_time=processing_time,
