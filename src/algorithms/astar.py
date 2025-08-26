@@ -4,7 +4,7 @@ import math
 from typing import Optional, Any
 
 from src.core.interfaces import ISearchAlgorithm, IHeuristic
-from src.core.state import StateNode
+from src.core.state_node import StateNode
 
 
 def _eval_heuristic(h: IHeuristic | Any, node: StateNode) -> float:
