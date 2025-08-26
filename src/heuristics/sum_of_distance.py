@@ -28,12 +28,12 @@ class SumOfDistanceMinimalMatchingCost(IHeuristic):
         return min(distances) if distances else 0.0
 
     def _match_boxes_goals(self, boxes: List[Tuple[int, int]], goals: List[Tuple[int, int]]) -> float:
-        if not boxes:
+        K = len(boxes)
+        if K == 0:
             return 0.0
-        cost_matrix = [[self._minkowski(box, goal) for goal in goals] for box in boxes]
-        indexes = self._munkres.compute(cost_matrix)
 
-        return float(sum(cost_matrix[row][col] for row, col in indexes))
+        total = sum(self._minkowski(box, goal) for box in boxes for goal in goals)
+        return total / K
 
     def calculate(self, state: SokobanState) -> int:
         boxes = [b for b in state.boxes if b not in state.goals]
