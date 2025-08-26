@@ -1,6 +1,6 @@
 
 from src.core.interfaces import ISearchAlgorithm, IHeuristic
-from src.core.state import StateNode
+from src.core.state_node import StateNode
 
 
 class GreedyAlgorithm(ISearchAlgorithm):

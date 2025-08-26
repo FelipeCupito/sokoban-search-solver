@@ -4,12 +4,14 @@ from src.core.interfaces import ISearchAlgorithm
 from src.algorithms.bfs import BFSAlgorithm
 from src.algorithms.dfs import DFS
 from src.algorithms.greedy import GreedyAlgorithm
+from src.algorithms.iddfs import IDDFS
 
 class AlgorithmType(Enum):
     BFS = "BFS"
     DFS = "DFS"
     ASTAR = "ASTAR"
     GREEDY = "GREEDY"
+    IDDFS = "IDDFS"
 
 
 class AlgorithmMapper:
@@ -24,6 +26,8 @@ class AlgorithmMapper:
             return AStar()
         elif AlgorithmType.GREEDY == algorithm_type:
             return GreedyAlgorithm()
+        elif AlgorithmType.IDDFS == algorithm_type:
+            return IDDFS()
         else:
             raise ValueError(f"Algoritmo desconocido: {algorithm_type}")
 

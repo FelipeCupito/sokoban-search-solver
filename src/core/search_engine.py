@@ -1,6 +1,7 @@
 import time
 from typing import Optional, List, Set, Tuple, Dict
-from src.core.state import SokobanState, StateNode
+from src.core.state import SokobanState
+from src.core.state_node import StateNode
 from src.core.result import SearchResult
 from src.core.interfaces import ISearchAlgorithm, IHeuristic
 import src.core as core
@@ -32,6 +33,7 @@ class SearchEngine:
 
     def search(self, initial_state: SokobanState) -> SearchResult:
         self._init_metrics()
+        
         start_node = StateNode(initial_state, parent=None, action="START")
         if initial_state.is_goal():
             return self._create_success_from_node(start_node)
