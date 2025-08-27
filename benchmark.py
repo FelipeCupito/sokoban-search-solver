@@ -2,7 +2,7 @@ import json
 import sys
 import time
 import statistics
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from typing import List, Optional
 from src.core.map_loader import MapLoader
@@ -121,7 +121,7 @@ class BenchmarkRunner:
         
         # Ejecutar tareas con threading y timeout
         timeout_seconds = self.config.timeout_minutes * 60
-        with ThreadPoolExecutor(max_workers=self.config.max_threads) as executor:
+        with ProcessPoolExecutor(max_workers=self.config.max_threads) as executor:
             # Enviar todas las tareas
             futures = {
                 executor.submit(self._run_single_algorithm, algorithm_type, heuristic_type, i): i 
@@ -236,7 +236,7 @@ class BenchmarkRunner:
         all_metrics = []
         completed = 0
         
-        with ThreadPoolExecutor(max_workers=self.config.max_threads) as executor:
+        with ProcessPoolExecutor(max_workers=self.config.max_threads) as executor:
             # Enviar todas las combinaciones como tareas
             future_to_combination = {
                 executor.submit(self._benchmark_combination, algo, heur): (algo, heur)
