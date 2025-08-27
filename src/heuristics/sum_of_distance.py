@@ -1,4 +1,3 @@
-from munkres import Munkres
 from src.core.interfaces import IHeuristic
 from src.core.state import SokobanState
 from typing import List, Tuple
@@ -10,12 +9,11 @@ class SumOfDistanceMinimalMatchingCost(IHeuristic):
     with the minimal matching cost between boxes and goals.
 
     - The distance metric used: Minkowski distance (``p=2`` by default)
-    - Optimal box-goal matching: Hungarian algorithm (Munkres implementation)
+    - Minkowski distances of all the boxes to all the storage locations at timestep t and add them. Then we average.
     """
 
     def __init__(self, p: int = 2):
         self.p = p
-        self._munkres = Munkres()
 
     def _minkowski(self, a: Tuple[int, int], b: Tuple[int, int]) -> float:
         diff = np.abs(np.array(a) - np.array(b)) ** self.p

@@ -1,37 +1,29 @@
+from typing import Tuple
+from munkres import Munkres
 from src.core.interfaces import IHeuristic
 from src.core.state import SokobanState
 import numpy as np
 
 class PerfectMatch(IHeuristic):
-    """Heuristic that matches box-goal pairs to ensure minimum l1 distance.
-
-    Args:
-        IHeuristic (_type_): _description_
+    """
+    Optimal box-goal matching: Hungarian algorithm (Munkres implementation)
     """
     def __init__(self):
+        self._munkres = Munkres()
         return
-    
+
     def calculate(self, state: SokobanState) -> int:
-        """Calculates the total sum of the Manhattan distance from each box to it's nearest goal.
+        boxes = [b for b in state.boxes if b not in state.goals]
+        goals = list(state.goals)
+        if len(boxes) == 0:
+            return 0
 
-        Args:
-            state (SokobanState): Current map of the game.
+        cost_matrix = [[self._minkowski(box, goal) for goal in goals] for box in boxes]
+        indexes = self._munkres.compute(cost_matrix)
 
-        Returns:
-            int: total sum of all Manhatan distances
-        """
-        boxes = np.array(list(state.boxes))
-        goals = np.array(list(state.goals))
-        h = 0
-        l1_mat = np.zeros((len(boxes),len(goals)))
-        for i,box in enumerate(boxes):
-            l1_mat[i:] = np.abs(goals-box).sum(axis=1)
-        for i in range(len(boxes)):
-            min_idx = np.argmin(l1_mat)
-            box_idx = min_idx//len(goals)
-            goal_idx = min_idx%len(goals)
-            h = h+l1_mat[box_idx,goal_idx]
-            l1_mat[box_idx] = np.inf
-            l1_mat[:,goal_idx] = np.inf
-        return h
+        return sum(cost_matrix[row][col] for row, col in indexes)
 
+    def _minkowski(self, a: Tuple[int, int], b: Tuple[int, int]) -> float:
+        diff = np.abs(np.array(a) - np.array(b)) ** 1
+
+        return np.power(diff.sum(), 1 / 1)
