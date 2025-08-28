@@ -1,10 +1,10 @@
 # 🎮 Sokoban Search Solver
 
-Un solver avanzado de Sokoban que implementa múltiples algoritmos de búsqueda con detección inteligente de deadlocks y capacidades de animación.
+Un solver de Sokoban que implementa múltiples algoritmos de búsqueda con detección de deadlocks y capacidades de animación.
 
 ## ✨ Características
 
-- 🔍 **Algoritmos de búsqueda:** BFS (Breadth-First Search) con arquitectura extensible
+- 🔍 **Algoritmos de búsqueda:** BFS, DFS, IDDFS, A*, Local Greedy
 - 🚫 **Detección de deadlocks:** Evita explorar estados imposibles para mayor eficiencia
 - 🎬 **Animación visual:** Reproduce las soluciones paso a paso
 - 📊 **Métricas detalladas:** Estadísticas completas de rendimiento
@@ -15,20 +15,15 @@ Un solver avanzado de Sokoban que implementa múltiples algoritmos de búsqueda 
 
 ### Componentes clave
 
+#### 🔍 **SearchEngine**
+- Motor genérico que funciona con cualquier algoritmo
+
 #### 🧠 **SokobanState**
 - Representa el estado del juego (jugador, cajas, paredes, objetivos)
-- Cache inteligente para optimización de performance
-- Generación eficiente de estados sucesores
 
 #### 🚫 **DeadlockDetector**
 - **Deadlock de esquinas:** Cajas atrapadas en esquinas sin objetivos
-- **Deadlock de paredes:** Cajas contra paredes sin camino a objetivos
 - **Deadlock de bloqueo mutuo:** Cuadrados 2x2 de cajas sin objetivos
-
-#### 🔍 **SearchEngine**
-- Motor genérico que funciona con cualquier algoritmo
-- Control de límites de tiempo y nodos
-- Métricas automáticas de rendimiento
 
 #### 📊 **SearchResult**
 - Factory methods para creación de resultados
@@ -52,19 +47,21 @@ python main.py config/test_config.json
 ```
 
 ### Archivo de configuración
+Ejemplo de archivo JSON de configuración para algoritmo BFS:
 ```json
 {
   "algorithm": "BFS",
   "map_name": "maps/level_1_easy.txt",
   "output_file": "mi_solucion",
+  "pruning": true,
   "generate_animation": true
 }
 ```
 
 ### Ver animaciones
+Ver la animacion de una solucion específica usando el módulo animator:
 ```bash
-# Animar una solución específica
-python test_animator.py
+python -m src.core.animator mi_solucion.csv maps/level_1.txt
 ```
 
 ## 🗺️ Formato de mapas
@@ -75,6 +72,8 @@ python test_animator.py
 - `$` - Caja
 - `.` - Objetivo
 - ` ` - Espacio libre
+- `+` - Jugador en objetivo
+- `*` - Caja en objetivo
 
 ### Ejemplo de mapa
 ```
@@ -92,6 +91,7 @@ python test_animator.py
 - **algorithm:** Algoritmo a usar (`"BFS"`)
 - **heuristic:** Heurística opcional (no implementada en BFS)
 - **map_name:** Ruta al archivo de mapa
+- **pruning:** Activar poda de deadlocks (`true`/`false`)
 - **output_file:** Nombre base para archivos de salida
 - **generate_animation:** Generar archivo CSV para animación (`true`/`false`)
 
@@ -137,6 +137,7 @@ class DFSAlgorithm(ISearchAlgorithm):
 ## 📁 Archivos generados
 
 ### Métricas (JSON)
+Ejemplo de un archivo de metricas generado:
 ```json
 {
   "algorithm": "BFS",
@@ -149,4 +150,12 @@ class DFSAlgorithm(ISearchAlgorithm):
     "processing_time_seconds": 0.0010
   }
 }
+```
+### Animación (CSV)
+Ejemplo de un archivo CSV generado para animación:
+
+```csv
+step,player_pos,boxes_pos,action
+0,"(1,1)","(1,2)",START
+1,"(1,2)","(1,3)",RIGHT
 ```

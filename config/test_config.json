@@ -1,6 +1,6 @@
 {
   "algorithm": "BFS",
-  "map_name": "maps/level_5.txt",
+  "map_name": "maps/level_1.txt",
   "pruning": true,
   "output_file": "test_main_solution",
   "generate_animation": true
